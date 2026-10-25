@@ -296,12 +296,12 @@ tests/              # pytest suite
 
 Planned work is tracked in [issues](https://github.com/ich74851-doom/recoverypilot/issues):
 
-- [ ] Parsers for Acronis Cyber Protect and Microsoft 365 backup report exports
+- [ ] Parsers for Acronis Cyber Protect and Microsoft 365 backup report exports ([#1](https://github.com/ich74851-doom/recoverypilot/issues/1))
 - [ ] Per-job change-rate baselines, so ransomware detection compares against each job's
-      own normal instead of a fixed threshold
-- [ ] Importable n8n workflow template (export in, Autotask ticket and Teams post out)
-- [ ] Container image and `docker compose` example for the webhook API
-- [ ] Self-contained HTML report alongside JSON and Markdown
+      own normal instead of a fixed threshold ([#2](https://github.com/ich74851-doom/recoverypilot/issues/2))
+- [ ] Importable n8n workflow template: export in, Autotask ticket and Teams post out ([#3](https://github.com/ich74851-doom/recoverypilot/issues/3))
+- [ ] Container image and `docker compose` example for the webhook API ([#4](https://github.com/ich74851-doom/recoverypilot/issues/4))
+- [ ] Self-contained HTML report alongside JSON and Markdown ([#5](https://github.com/ich74851-doom/recoverypilot/issues/5))
 
 ## Related projects
 
