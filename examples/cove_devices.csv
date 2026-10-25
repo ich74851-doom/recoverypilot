@@ -1,0 +1,9 @@
+# SYNTHETIC SAMPLE DATA - fictional companies and devices, generated for demos and tests.
+# Format: Cove Data Protection-style device CSV. No real client data.
+Customer,Device name,Data source,Last session status,Last session time,Last successful session,Errors,Selected size (GB),Changed files,Change rate (%)
+Tailspin Clinic,TSC-RECEPTION01,Files and Folders,Completed,2026-10-20 06:10:00,2026-10-20 06:10:00,,38.2,412,0.8
+Tailspin Clinic,TSC-PM01,System State,Failed,2026-10-20 05:02:00,2026-10-17 05:01:00,"Timeout while waiting for storage node response; connection reset by peer",96.0,,
+Adatum Accounting,ADA-LT07,Files and Folders,NotStarted,2026-10-14 18:00:00,2026-10-14 18:00:00,"Device offline: backup agent not responding",54.1,,
+Adatum Accounting,ADA-FS01,Files and Folders,OverQuota,2026-10-20 01:15:00,2026-10-18 01:12:00,,1630.0,,
+Northwind Dental,NWD-WS03,Files and Folders,CompletedWithErrors,2026-10-20 04:00:00,2026-10-19 04:00:00,"3 files skipped: the process cannot access the file because it is being used by another process (archive.pst)",22.5,96,0.6
+Fabrikam Legal,FAB-LT02,Files and Folders,Completed,2026-10-16 17:20:00,2026-10-16 17:20:00,,61.7,230,1.4

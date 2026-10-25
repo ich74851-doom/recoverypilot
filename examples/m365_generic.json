@@ -1,0 +1,27 @@
+{
+  "_comment": "SYNTHETIC SAMPLE DATA in RecoveryPilot's generic normalised format (e.g. produced by an n8n transform from any cloud-to-cloud backup tool). Fictional tenants only.",
+  "jobs": [
+    {
+      "vendor": "m365-backup",
+      "client": "Contoso Logistics",
+      "job_name": "Exchange Online mailboxes",
+      "host": "contoso-logistics.example",
+      "status": "failed",
+      "started_at": "2026-10-20T02:00:00Z",
+      "ended_at": "2026-10-20T02:00:20Z",
+      "message": "Authentication failed: token has expired. Re-authorize the Microsoft 365 application.",
+      "last_success_at": "2026-10-18T02:31:00Z"
+    },
+    {
+      "vendor": "m365-backup",
+      "client": "Northwind Dental",
+      "job_name": "OneDrive and SharePoint",
+      "host": "northwind-dental.example",
+      "status": "success",
+      "started_at": "2026-10-20T03:00:00Z",
+      "ended_at": "2026-10-20T03:48:00Z",
+      "transferred_gb": 3.2,
+      "change_rate_pct": 1.9
+    }
+  ]
+}

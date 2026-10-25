@@ -1,0 +1,16 @@
+# SYNTHETIC SAMPLE DATA - fictional companies and hosts, generated for demos and tests.
+# Format: Veeam-style job report CSV. No real client data.
+Company,Job Name,Object,Status,Start Time,End Time,Transferred (GB),Change Rate (%),New Extensions,Last Success,Details
+Northwind Dental,SQL Nightly,NWD-SQL01,Success,2026-10-18 01:00:00,2026-10-18 01:42:10,18.4,3.1,,,
+Northwind Dental,SQL Nightly,NWD-SQL01,Failed,2026-10-19 01:00:00,2026-10-19 01:06:51,0,,,,"Failed to prepare guest for hot backup: SqlServerWriter is in a failed state. VSS_E_WRITERERROR_RETRYABLE (0x800423f3)"
+Northwind Dental,SQL Nightly,NWD-SQL01,Failed,2026-10-20 01:00:00,2026-10-20 01:07:02,0,,,,"Failed to prepare guest for hot backup: SqlServerWriter is in a failed state. VSS_E_WRITERERROR_RETRYABLE (0x800423f3)"
+Northwind Dental,Infrastructure Daily,NWD-DC01,Success,2026-10-18 22:00:00,2026-10-18 22:18:44,4.2,1.2,,,
+Northwind Dental,Infrastructure Daily,NWD-DC01,Success,2026-10-19 22:00:00,2026-10-19 22:17:30,4.0,1.1,,,
+Fabrikam Legal,File Server Daily,FAB-FS01,Success,2026-10-19 03:00:00,2026-10-19 03:51:12,22.8,2.4,,,
+Fabrikam Legal,File Server Daily,FAB-FS01,Success,2026-10-20 03:00:00,2026-10-20 05:44:09,611.5,63.0,.docx;.akira,,"Processing finished. Data change rate significantly above average."
+Fabrikam Legal,Application Servers,FAB-APP01,Failed,2026-10-19 00:30:00,2026-10-19 00:31:15,0,,,2026-10-18 00:58:40,"Error: Not enough free space on backup repository FAB-REPO01 (free 12.4 GB, required 85.0 GB)"
+Fabrikam Legal,Application Servers,FAB-APP01,Failed,2026-10-20 00:30:00,2026-10-20 00:31:09,0,,,2026-10-18 00:58:40,"Error: Not enough free space on backup repository FAB-REPO01 (free 11.9 GB, required 85.3 GB)"
+Contoso Logistics,Hyper-V Cluster,CTL-HV01,Warning,2026-10-20 02:00:00,2026-10-20 04:12:33,140.2,6.5,,,"Changed block tracking reset for VM disk; full read performed"
+Contoso Logistics,Web Tier,CTL-WEB01,Failed,2026-10-20 02:30:00,2026-10-20 02:45:30,0,,,2026-10-19 02:41:10,"Failed to connect to guest: The RPC server is unavailable. (0x800706BA)"
+Adatum Accounting,App Server Weekly,ADA-APP02,Failed,2026-10-19 21:00:00,2026-10-19 21:00:41,0,,,2026-10-12 21:34:00,"Guest processing: Access is denied. Logon failure: unknown user name or bad password"
+Adatum Accounting,Hyper-V Hosts,ADA-HV01,Running,2026-10-20 07:30:00,,,,,2026-10-19 08:02:00,"Processing ADA-HV01"

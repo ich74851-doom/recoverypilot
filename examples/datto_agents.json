@@ -1,0 +1,53 @@
+{
+  "_comment": "SYNTHETIC SAMPLE DATA - fictional companies and agents, generated for demos and tests. No real client data.",
+  "exportType": "datto-bcdr",
+  "generatedAt": "2026-10-20T07:55:00Z",
+  "agents": [
+    {
+      "organization": "Contoso Logistics",
+      "applianceName": "CTL-SIRIS01",
+      "agentName": "CTL-SQL02",
+      "backupStatus": "success",
+      "lastBackupAttempt": "2026-10-20T06:00:00Z",
+      "lastSuccessfulBackup": "2026-10-20T06:00:00Z",
+      "errorMessage": "",
+      "screenshotVerification": "failed",
+      "changeRatePct": 2.7
+    },
+    {
+      "organization": "Tailspin Clinic",
+      "applianceName": "TSC-SIRIS01",
+      "agentName": "TSC-DC01",
+      "backupStatus": "success",
+      "lastBackupAttempt": "2026-10-20T07:00:00Z",
+      "lastSuccessfulBackup": "2026-10-20T07:00:00Z",
+      "errorMessage": "",
+      "screenshotVerification": "passed",
+      "changeRatePct": 0.9
+    },
+    {
+      "organization": "Tailspin Clinic",
+      "applianceName": "TSC-SIRIS01",
+      "agentName": "TSC-FS02",
+      "backupStatus": "warning",
+      "lastBackupAttempt": "2026-10-20T07:00:00Z",
+      "lastSuccessfulBackup": "2026-10-20T06:00:00Z",
+      "errorMessage": "Backup completed with 1204 files skipped. New file HOW_TO_DECRYPT.txt detected in 37 folders.",
+      "screenshotVerification": "passed",
+      "changeRatePct": 71.4,
+      "filesChanged": 48211,
+      "newExtensions": [".xlsx", ".pdf"]
+    },
+    {
+      "organization": "Adatum Accounting",
+      "applianceName": "ADA-ALTO01",
+      "agentName": "ADA-SQL01",
+      "backupStatus": "failed",
+      "lastBackupAttempt": "2026-10-20T05:00:00Z",
+      "lastSuccessfulBackup": "2026-10-19T05:00:00Z",
+      "errorMessage": "Backup failed: license has expired for this protected agent",
+      "screenshotVerification": "n/a",
+      "changeRatePct": null
+    }
+  ]
+}
