@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "recoverypilot"
+version = "0.1.0"
+description = "AI-assisted backup incident triage for MSP backup operations: parse Veeam, Cove and Datto job exports, classify failures, score them against RPO/SLA and suggest remediation."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Ishant Choudhary" }]
+keywords = ["backup", "disaster-recovery", "msp", "aiops", "incident-triage", "veeam", "rpo"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Archiving :: Backup",
+    "Topic :: System :: Monitoring",
+]
+dependencies = [
+    "pydantic>=2.5",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.6"]
+
+[project.scripts]
+recoverypilot = "recoverypilot.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ich74851-doom/recoverypilot"
+Issues = "https://github.com/ich74851-doom/recoverypilot/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+recoverypilot = ["data/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF012"]
