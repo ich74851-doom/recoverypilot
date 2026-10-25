@@ -1,0 +1,279 @@
+# RecoveryPilot default classification rules.
+#
+# A rule matches when ALL of its `match` conditions hold; inside a list, ANY item may
+# match. When several rules match, the strongest wins (severity, then lowest priority)
+# and the others are listed as secondary matches.
+#
+# Available conditions: statuses, vendors, message_regex, extensions_any,
+# min_change_rate_pct, min_files_changed, min_consecutive_failures, rpo_breached.
+# `fallback: true` rules only headline a finding when no specific rule matched.
+#
+# Copy this file, tune it for your environment and pass it with `--rules`.
+version: 1
+rules:
+  # ------------------------------------------------------------------ ransomware
+  - id: RANSOM-001
+    title: Known ransomware / encryption extensions in protected data
+    category: ransomware
+    severity: critical
+    priority: 1
+    description: >
+      New files with extensions commonly appended by ransomware were observed in the
+      backup set. Treat as a potential security incident until proven otherwise.
+    match:
+      extensions_any: [.locked, .encrypted, .crypted, .crypt, .enc, .lockbit, .akira,
+                       .royal, .basta, .ryk, .wncry, .cerber, .locky, .zepto, .phobos]
+    remediation:
+      - Do NOT delete or prune any restore points; pause retention/cleanup jobs for this client.
+      - Escalate to the security/SOC on-call and follow the ransomware recovery runbook.
+      - Isolate the affected host from the network (EDR isolation or switch port), do not power it off.
+      - Identify the last clean restore point by browsing file versions before the first suspicious change.
+      - Verify immutable / offsite copies are intact before any restore activity.
+    references:
+      - https://github.com/ich74851-doom/dr-runbooks
+
+  - id: RANSOM-002
+    title: Ransom note indicators in job log
+    category: ransomware
+    severity: critical
+    priority: 2
+    match:
+      message_regex:
+        - 'README[_-]?(TO|FOR)[_-]?DECRYPT'
+        - 'HOW[_-]?TO[_-]?(RECOVER|DECRYPT|RESTORE)'
+        - 'restore[_-]my[_-]files'
+        - 'ransom'
+    remediation:
+      - Treat as an active security incident; escalate to the security/SOC on-call immediately.
+      - Preserve restore points and logs; suspend retention and any automated cleanup.
+      - Isolate the host and check for lateral movement before restoring anything.
+    references:
+      - https://github.com/ich74851-doom/dr-runbooks
+
+  - id: RANSOM-003
+    title: Abnormal data change rate (possible mass encryption)
+    category: ransomware
+    severity: high
+    priority: 5
+    description: >
+      An unusually large share of protected data changed since the previous run. This can
+      be legitimate (database rebuild, defrag, migration) but is also a classic early sign
+      of mass encryption.
+    match:
+      min_change_rate_pct: 40
+    remediation:
+      - Compare against the job's normal change rate and any scheduled maintenance or migrations.
+      - Spot-check recently modified files on the host for unreadable content or new extensions.
+      - Check EDR/AV consoles for alerts on the host in the same time window.
+      - If unexplained, protect the previous restore point (lock/immutable copy) before the next run.
+
+  # ------------------------------------------------------------------ storage
+  - id: STOR-001
+    title: Backup target / repository out of space or over quota
+    category: storage
+    severity: high
+    priority: 10
+    match:
+      statuses: [failed, warning]
+      message_regex:
+        - 'not enough (free )?(disk )?space'
+        - 'insufficient (free )?(disk )?space'
+        - 'disk (is )?full'
+        - 'quota (exceeded|reached)'
+        - 'repository .*(full|out of space)'
+        - 'no space left'
+        - '0x80070070'
+    remediation:
+      - Check repository / target free space and the growth trend for this client.
+      - Review retention settings and remove orphaned or expired restore points per policy.
+      - If over a cloud quota, raise the quota or adjust the selection with the client's approval.
+      - Re-run the job once space is confirmed and verify the chain completed.
+
+  # ------------------------------------------------------------------ vss / application
+  - id: APP-001
+    title: Application-aware processing failure (SQL / Exchange)
+    category: application
+    severity: high
+    priority: 15
+    match:
+      statuses: [failed, warning]
+      message_regex:
+        - 'application[- ]aware'
+        - 'SqlServerWriter|SQL Server VSS Writer'
+        - 'transaction log'
+        - 'log truncation'
+        - 'Microsoft Exchange Writer'
+    remediation:
+      - Check the guest credentials used for application-aware processing.
+      - Run `vssadmin list writers` in the guest and confirm the SQL/Exchange writer is stable.
+      - Check SQL/Exchange logs for backups taken by other tools that break the log chain.
+      - Confirm transaction log growth is under control until a successful backup truncates it.
+
+  - id: VSS-001
+    title: VSS snapshot / writer failure
+    category: vss
+    severity: high
+    priority: 20
+    match:
+      statuses: [failed, warning]
+      message_regex:
+        - '\bVSS\b'
+        - 'shadow copy'
+        - 'VSS_E_[A-Z_]+'
+        - '0x800423f[0-9a-f]'
+        - 'writer .*(failed|timed out|retryable|non-retryable)'
+    remediation:
+      - Run `vssadmin list writers` and note any writer not in a Stable / No error state.
+      - Restart the service that owns the failed writer (e.g. SQL Writer, Hyper-V VMMS, WMI) out of hours.
+      - Check shadow storage with `vssadmin list shadowstorage` and free space on the source volume.
+      - Look for overlapping snapshot schedules (other backup agents, AV, Windows Server Backup).
+      - Review Application log events from VSS (8193, 12289, 12293) around the job start time.
+    references:
+      - https://github.com/ich74851-doom/backup-dr-powershell-toolkit
+
+  # ------------------------------------------------------------------ credentials
+  - id: AUTH-001
+    title: Credential or permission failure
+    category: credentials
+    severity: high
+    priority: 25
+    match:
+      statuses: [failed, warning]
+      message_regex:
+        - 'access (is )?denied'
+        - 'logon failure'
+        - 'authentication (failed|failure)'
+        - 'invalid (credentials|password|user ?name)'
+        - 'password (has )?expired'
+        - '0x80070005'
+        - '\b401\b|unauthori[sz]ed'
+        - 'token (has )?expired'
+    remediation:
+      - Check whether the backup service account password was changed or has expired.
+      - Update the stored credential in the backup console and test it against the host.
+      - Confirm the account still has local admin / required role permissions.
+      - For Microsoft 365 jobs, re-authorise the app registration or consent if the token expired.
+
+  # ------------------------------------------------------------------ verification
+  - id: VERIFY-001
+    title: Recovery point verification failed
+    category: verification
+    severity: high
+    priority: 30
+    match:
+      message_regex:
+        - 'screenshot verification failed'
+        - 'verification failed'
+        - 'health check .*(failed|corrupt)'
+        - 'checksum (mismatch|error)'
+        - 'corrupt'
+    remediation:
+      - Treat the latest recovery point as unproven until a test boot or file-level restore succeeds.
+      - Run a manual verification / test restore of the latest point.
+      - If corruption is reported, run a storage-level health check and an active full if required.
+    references:
+      - https://github.com/ich74851-doom/hyperv-vmware-restore-validation
+
+  # ------------------------------------------------------------------ network
+  - id: NET-001
+    title: Network / connectivity timeout
+    category: network
+    severity: medium
+    priority: 40
+    match:
+      statuses: [failed, warning]
+      message_regex:
+        - 'timed? ?out'
+        - 'connection (was )?(reset|refused|lost|closed|forcibly closed)'
+        - 'network path was not found'
+        - 'host (is )?unreachable|unreachable host'
+        - 'RPC server is unavailable'
+        - '0x80070035|0x800706ba'
+        - 'name resolution|could not resolve'
+    remediation:
+      - Confirm the host and the backup server / gateway can reach each other on the required ports.
+      - Check for ISP outages, VPN tunnel drops or firewall changes in the job window.
+      - Check DNS resolution of the host name from the backup server.
+      - If recurrent at the same time, look for bandwidth contention with other scheduled jobs.
+
+  # ------------------------------------------------------------------ agent / schedule
+  - id: AGENT-001
+    title: Backup agent offline or job did not start
+    category: agent
+    severity: medium
+    priority: 45
+    match:
+      statuses: [failed, missed]
+      message_regex:
+        - 'agent (is )?(offline|not responding|unreachable)'
+        - 'device (is )?offline'
+        - 'service (is )?not running'
+        - 'did not (start|run|respond)'
+        - 'not started'
+    remediation:
+      - Check the device is powered on and online in the RMM.
+      - Restart the backup agent service and confirm it reconnects to the console.
+      - Confirm the schedule is enabled and not blocked by a maintenance window.
+
+  - id: LICENSE-001
+    title: Licensing or subscription problem
+    category: licensing
+    severity: medium
+    priority: 50
+    match:
+      message_regex:
+        - 'licen[cs]e (has )?(expired|exceeded|invalid)'
+        - 'no (available )?licen[cs]es'
+        - 'subscription (has )?expired'
+    remediation:
+      - Check licence allocation in the vendor console for this client.
+      - Reclaim licences from decommissioned devices or raise a purchase request.
+
+  # ------------------------------------------------------------------ low severity
+  - id: LOCK-001
+    title: Files skipped because they were locked or in use
+    category: file-access
+    severity: low
+    priority: 70
+    match:
+      statuses: [warning, failed]
+      message_regex:
+        - 'being used by another process'
+        - 'file is locked'
+        - 'sharing violation'
+        - 'files? (were )?skipped'
+    remediation:
+      - Identify the skipped files; if they matter (PSTs, databases) protect them with VSS or app-aware backup.
+      - Exclude transient / temp paths that do not need protecting.
+
+  - id: CBT-001
+    title: Changed block tracking reset or unavailable
+    category: cbt
+    severity: low
+    priority: 75
+    match:
+      statuses: [warning, failed]
+      message_regex:
+        - '\bCBT\b'
+        - 'changed block tracking'
+    remediation:
+      - Expect a longer, full-read incremental on the next run; check it fits the backup window.
+      - If CBT resets repeatedly, reset CBT on the VM during a maintenance window.
+
+  # ------------------------------------------------------------------ RPO catch-all
+  - id: RPO-001
+    title: RPO breached / no recent successful backup
+    category: rpo
+    severity: high
+    priority: 900
+    fallback: true
+    description: >
+      The newest successful recovery point is older than the client's RPO. As a fallback
+      rule it is only the headline when nothing more specific matched (e.g. a stale job
+      whose last run reported success); RPO impact is always added to the score anyway.
+    match:
+      rpo_breached: true
+    remediation:
+      - Confirm when the last good recovery point was created and tell the client owner if the SLA is at risk.
+      - Run the job manually once the underlying cause is fixed and confirm a new restore point exists.
+      - Check the schedule is enabled and not stuck behind a long-running job.

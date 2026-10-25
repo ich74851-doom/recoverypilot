@@ -1,0 +1,29 @@
+# RecoveryPilot example configuration (fictional clients that match the synthetic samples).
+# Copy to config.local.yaml (git-ignored) and adapt to your own client SLAs.
+
+default_rpo_hours: 24      # used when a client has no explicit policy
+default_tier: 3            # 1 = business critical, 2 = important, 3 = standard
+
+clients:
+  Northwind Dental:   { rpo_hours: 24, tier: 1 }
+  Fabrikam Legal:     { rpo_hours: 12, tier: 1 }
+  Contoso Logistics:  { rpo_hours: 24, tier: 2 }
+  Tailspin Clinic:    { rpo_hours: 24, tier: 1 }
+  Adatum Accounting:  { rpo_hours: 48, tier: 3 }
+
+priority_thresholds:       # score needed for each priority band
+  p1: 80
+  p2: 60
+  p3: 40
+
+# rules_file: ./my_rules.yaml      # override the bundled rules
+# webhook_url: https://n8n.example.com/webhook/backup-triage
+
+llm:
+  enabled: false           # or pass --llm on the command line
+  provider: mock           # mock | openai | anthropic
+  model: gpt-4o-mini       # e.g. claude-sonnet-4-5 for provider: anthropic
+  # base_url: http://localhost:11434/v1   # any OpenAI-compatible endpoint
+  api_key_env: RECOVERYPILOT_LLM_API_KEY  # the key is read from this env var, never from this file
+  max_findings: 15
+  redact: true             # pseudonymise client and host names before sending
